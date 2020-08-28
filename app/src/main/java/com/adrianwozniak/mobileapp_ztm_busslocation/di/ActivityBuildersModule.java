@@ -2,6 +2,7 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.di;
 
 
 
+import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityViewModelsModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivity;
 
@@ -24,6 +25,7 @@ public abstract class ActivityBuildersModule {
     @ContributesAndroidInjector(
             modules = {
                     MainActivityViewModelsModule.class,
+                    MainActivityModule.class
             }
     )
     abstract MainActivity contributeMainActivity();

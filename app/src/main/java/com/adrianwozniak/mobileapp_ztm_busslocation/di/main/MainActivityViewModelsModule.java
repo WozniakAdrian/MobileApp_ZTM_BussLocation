@@ -2,8 +2,7 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.di.main;
 
 import androidx.lifecycle.ViewModel;
 
-import com.adrianwozniak.mobileapp_ztm_busslocation.di.ViewModelKey;
-import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivity;
+import com.adrianwozniak.mobileapp_ztm_busslocation.di.annotations.ViewModelKey;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivityViewModel;
 
 import dagger.Binds;

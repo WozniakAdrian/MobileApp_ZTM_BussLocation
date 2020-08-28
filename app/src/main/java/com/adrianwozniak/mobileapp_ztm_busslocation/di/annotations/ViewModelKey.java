@@ -1,4 +1,4 @@
-package com.adrianwozniak.mobileapp_ztm_busslocation.di;
+package com.adrianwozniak.mobileapp_ztm_busslocation.di.annotations;
 
 import androidx.lifecycle.ViewModel;
 
