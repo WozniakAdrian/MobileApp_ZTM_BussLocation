@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottom_nav_page_1"
+        android:enabled="true"
+        android:icon="@drawable/ic_search_dark"
+        android:title="@string/search"/>
+    <item
+        android:id="@+id/bottom_nav_page_2"
+        android:enabled="true"
+        android:icon="@drawable/ic_map_dark_24dp"
+        android:title="@string/map"/>
+</menu>

@@ -1,31 +1,45 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main;
 
-import androidx.lifecycle.Observer;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.adrianwozniak.mobileapp_ztm_busslocation.BaseActivity;
+import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.ActivityMainBinding;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
-import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsResponse;
-import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
-import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.VehicleResponse;
-import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.android.support.DaggerAppCompatActivity;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends DaggerAppCompatActivity  {
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
+
+
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks {
     private static final String TAG = "MainActivity";
 
     private ActivityMainBinding mBinding;
 
 
     private MainActivityViewModel mViewModel;
+
+    @Inject
+    PermissionManager mPermissionManager;
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
@@ -42,37 +56,42 @@ public class MainActivity extends DaggerAppCompatActivity  {
 
         mViewModel = new ViewModelProvider(this, mProviderFactory).get(MainActivityViewModel.class);
 
-        subscribeObservers();
+        mBinding.viewPager.setAdapter(
+                new ViewPagerAdapter(getSupportFragmentManager(), 0)
+        );
 
-        mBinding.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.getEstimatedDelay();
-            }
-        });
+
+        NavigationAdapter.getInstance(mBinding);
+
+        mPermissionManager.requestPermissions(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, Arrays.asList(PERMISSION_LOCATION_ARRAY))) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        Log.d(TAG, "onPermissionsGranted: successful");
 
     }
 
-    private void subscribeObservers() {
-        mViewModel.observeEstimatedDelayResponse().observe(this, new Observer<Resource<VehicleResponse>>() {
-            @Override
-            public void onChanged(Resource<VehicleResponse> vehicleResponseResource) {
-                switch (vehicleResponseResource.status) {
-                    case ERROR:{
-                        Log.e(TAG, "onChanged: error: " + vehicleResponseResource.message);
-                        break;
-                    }
-                    case LOADING:{
-                        Log.d(TAG, "onChanged: loading");
-                        break;
-                    }
-                    case SUCCESS:{
-                        Log.d(TAG, "onChanged: success: " + vehicleResponseResource.data.getLastUpdate());
-                        Log.d(TAG, "onChanged: size:" + vehicleResponseResource.data.toString());
-                        break;
-                    }
-                }
-            }
-        });
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
     }
 }

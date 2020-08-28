@@ -1,10 +1,12 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.di;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -15,15 +17,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
- *  All application level dependencies should be here
- *  @Provides - declares dependencies, should be static
+ * All application level dependencies should be here
+ *
+ * @Provides - declares dependencies, should be static
  */
 @Module
-public class AppModule {
+public abstract class AppModule {
 
     @Provides
     @Singleton
-    static OkHttpClient provideOkHttpClient(){
+    static OkHttpClient provideOkHttpClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
         return new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -33,7 +36,7 @@ public class AppModule {
     @Provides
     @Singleton
     @Named("BusStops")
-    static Retrofit provideRetrofitInstanceBusStop(OkHttpClient client){
+    static Retrofit provideRetrofitInstanceBusStop(OkHttpClient client) {
 
         return new Retrofit.Builder()
                 .baseUrl(Constants.RETROFIT_ZTM_BASE_URL_STOPS)
@@ -46,7 +49,7 @@ public class AppModule {
     @Provides
     @Singleton
     @Named("EstimatedDelay")
-    static Retrofit provideRetrofitInstanceDelays(OkHttpClient client){
+    static Retrofit provideRetrofitInstanceDelays(OkHttpClient client) {
 
         return new Retrofit.Builder()
                 .baseUrl(Constants.RETROFIT_ZTM_BASE_URL_DELAYS)
@@ -55,4 +58,12 @@ public class AppModule {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
+
+    @Provides
+    @Singleton
+    static PermissionManager providePermissionManager() {
+        return new PermissionManager();
+    }
+
+
 }

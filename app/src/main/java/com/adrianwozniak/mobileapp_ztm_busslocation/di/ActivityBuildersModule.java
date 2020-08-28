@@ -2,6 +2,9 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.di;
 
 
 
+import androidx.fragment.app.Fragment;
+
+import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.FragmentBuildersModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityViewModelsModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivity;
@@ -25,7 +28,8 @@ public abstract class ActivityBuildersModule {
     @ContributesAndroidInjector(
             modules = {
                     MainActivityViewModelsModule.class,
-                    MainActivityModule.class
+                    MainActivityModule.class,
+                    FragmentBuildersModule.class,
             }
     )
     abstract MainActivity contributeMainActivity();

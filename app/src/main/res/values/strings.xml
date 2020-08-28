@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MobileApp_ZTM_BussLocation</string>
+
+    <string name="search">Znajdź</string>
+    <string name="map">Mapa</string>
+    <string name="location_rationale">insert rationale here</string>
+    <string name="autocomplete_hint">Wprowadź nazwę przystanku lub numer linii</string>
+    <string name="search_input_hint">Znajdz przystanek lub linię</string>
 </resources>
