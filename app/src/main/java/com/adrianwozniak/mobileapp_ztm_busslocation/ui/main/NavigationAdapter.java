@@ -15,9 +15,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * follow, this on Click listener spy bottom navigation, when menu item will be selected, automatically
  * view pager will change fragment and menu item will set cheked and otherwise if View Pager will change
  * his page menu item will change it too
- *
  */
 public class NavigationAdapter {
+    private static final String TAG = "NavigationAdapter";
 
     private static NavigationAdapter instance;
 
@@ -39,7 +39,6 @@ public class NavigationAdapter {
         binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-
                 switch (menuItem.getItemId()) {
                     case R.id.bottom_nav_page_1: {
                         binding.viewPager.setCurrentItem(0);
