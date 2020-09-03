@@ -1,9 +1,6 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter;
 
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.StringServices;
 
 public class BusStopViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -18,7 +16,7 @@ public class BusStopViewHolder extends RecyclerView.ViewHolder implements View.O
 
     OnRecycleViewClickListener mClickListener;
 
-    TextView displayText;
+    TextView displayName, displayDistance, displayZoneName, hideStopId;
 
 
     public BusStopViewHolder(@NonNull View itemView, OnRecycleViewClickListener listener) {
@@ -26,17 +24,23 @@ public class BusStopViewHolder extends RecyclerView.ViewHolder implements View.O
 
         this.mClickListener = listener;
 
-        displayText = itemView.findViewById(R.id.display_text_list_item);
+        displayName = itemView.findViewById(R.id.display_name_list_item);
+        displayZoneName = itemView.findViewById(R.id.display_zone_list_item);
+        displayDistance = itemView.findViewById(R.id.display_distance_list_item);
+        hideStopId = itemView.findViewById(R.id.hide_stopId);
 
         itemView.setOnClickListener(this);
     }
 
-    public void onBind(BusStop busStop) {
-        displayText.setText(StringServices.getDisplayName(busStop));
+    public void onBind(Distance<BusStop> busStop) {
+        displayName.setText(StringServices.getDisplayName(busStop.data));
+        displayZoneName.setText(busStop.data.getZoneName());
+        displayDistance.setText(StringServices.getDistance(busStop));
+        hideStopId.setText(busStop.data.getStopId().toString());
     }
 
     @Override
     public void onClick(View v) {
-        mClickListener.onRecyclerViewItemClickListener(displayText.getText().toString());
+        mClickListener.onStopClick(hideStopId.getText().toString());
     }
 }

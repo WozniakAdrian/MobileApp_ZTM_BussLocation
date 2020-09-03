@@ -1,7 +1,12 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.di;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
+
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
+import com.google.android.gms.location.LocationRequest;
+import com.patloew.rxlocation.RxLocation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -9,11 +14,14 @@ import javax.inject.Singleton;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.LOCATION_INTERVAL;
 
 
 /**
@@ -65,5 +73,21 @@ public abstract class AppModule {
         return new PermissionManager();
     }
 
+    @SuppressLint("MissingPermission")
+    @Provides
+    @Singleton
+    static Observable provideLocation(Application application){
+        RxLocation rxLocation = new RxLocation(application.getApplicationContext());
+
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(LOCATION_INTERVAL);
+
+        return rxLocation.location()
+                .updates(locationRequest)
+                .flatMap(location -> rxLocation.geocoding().fromLocation(location).toObservable());
+
+
+    }
 
 }

@@ -3,7 +3,7 @@
 
     <string name="search">Znajdź</string>
     <string name="map">Mapa</string>
-    <string name="location_rationale">insert rationale here</string>
+    <string name="location_rationale">Yours location is necessary to working with showing distance and nearest Bus Stop, please consider to turn it on.</string>
     <string name="autocomplete_hint">Wprowadź nazwę przystanku lub numer linii</string>
     <string name="search_input_hint">Znajdz przystanek lub linię</string>
 </resources>

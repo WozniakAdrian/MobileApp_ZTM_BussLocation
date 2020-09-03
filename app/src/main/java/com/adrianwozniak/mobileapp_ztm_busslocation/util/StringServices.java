@@ -1,8 +1,8 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.util;
 
 
-
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 
 import java.text.DecimalFormat;
 
@@ -16,16 +16,26 @@ public class StringServices {
      * Because input dataset have somme isues this class is necessary.
      * In recived json stopDesc field "gdansk" is not added by default
      * This method return ready to display formated string
+     *
      * @param value BusStop Object
      * @return string
      */
-    public static String getDisplayName(BusStop value){
-        if(value == null){
+    public static String getDisplayName(BusStop value) {
+        if (value == null) {
             throw new NullPointerException();
-        }else{
-            String s = (value.getZoneName().equals("Gdańsk"))? value.getZoneName() : "";
-            return  value.getStopDesc() + " " + value.getSubName() + " " + s;
         }
+        String displayName = "";
+
+        if (value.getStopDesc().startsWith("Gdynia ")) {
+            displayName = value.getStopDesc().replaceAll("Gdynia ", "");
+        } else {
+            displayName = value.getStopDesc();
+        }
+
+        displayName += " " + value.getSubName();
+
+        return displayName;
+
     }
 
 
@@ -35,18 +45,18 @@ public class StringServices {
      * @param value BusStopWithDistance object
      * @return string ready to display
      */
-//    public static String getDistance(BusStopWithDistance value){
-//
-//        if(value == null){
-//            throw new NullPointerException();
-//        }else{
-//            String s = value.getDistance() > 999 ? df.format(value.getDistance() / 1000d ) + "km":
-//                    value.getDistance().intValue() + "m";
-//
-//            return s;
-//        }
-//
-//    }
+    public static String getDistance(Distance<BusStop> value){
+
+        if(value == null){
+            throw new NullPointerException();
+        }else{
+            String s = value.distance > 999 ? df.format(value.distance / 1000d ) + "km":
+                    (int) value.distance + "m";
+
+            return s;
+        }
+
+    }
 
 
     /***
@@ -55,12 +65,12 @@ public class StringServices {
      * @param s String
      * @return String[]
      */
-    public static String[] getSeparatedStrings(String s){
-        String[] list = {"","",""};
-        if(s.isEmpty()){
-            return  list;
+    public static String[] getSeparatedStrings(String s) {
+        String[] list = {"", "", ""};
+        if (s.isEmpty()) {
+            return list;
         }
-        if(s != null) {
+        if (s != null) {
 
             int spaceIndex = -1;
 
@@ -82,7 +92,7 @@ public class StringServices {
             list[2] = s.substring(s.length() - 2, s.length());
         }
 
-        return  list;
+        return list;
     }
 }
 
