@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModel;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsResponse;
+import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.BusStopRepository;
+import com.adrianwozniak.mobileapp_ztm_busslocation.repository.EstimatedDelayRepository;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.DistanceCalculator;
 
@@ -32,15 +34,20 @@ public class SearchFragmentViewModel extends ViewModel {
 
     private final Observable mLocation;
     private final BusStopRepository mBusStopRepository;
+    private final EstimatedDelayRepository mEstimatedDelayRepository;
     private MediatorLiveData<Resource<Address>> mAddress = new MediatorLiveData<>();
 
+
+    public DetailsState mDetailsState;
 
     @Inject
     public SearchFragmentViewModel(
             BusStopRepository busStopRepository,
+            EstimatedDelayRepository estimatedDelayRepository,
             Observable location) {
         Log.d(TAG, "SearchFragmentViewModel: working");
 
+        mEstimatedDelayRepository = estimatedDelayRepository;
         mBusStopRepository = busStopRepository;
         mLocation = location;
     }
@@ -56,6 +63,15 @@ public class SearchFragmentViewModel extends ViewModel {
     public void getBusStops() {
         mBusStopRepository.getBusStop();
     }
+
+    public void getEstimatedDelaysBy(int stopId){
+        mEstimatedDelayRepository.getEstimatedDelayResponse(stopId);
+    }
+
+    public LiveData<Resource<EstimatedDelayResponse>> observeEstimatedDelay() {
+        return mEstimatedDelayRepository.observeEstimatedDelayResponse();
+    }
+
 
     public void getLocation() {
         mAddress.setValue(Resource.loading(null));
@@ -107,4 +123,40 @@ public class SearchFragmentViewModel extends ViewModel {
 
         return mDistanceBusStop;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public enum DetailsState { VISIBLE , GONE};
 }

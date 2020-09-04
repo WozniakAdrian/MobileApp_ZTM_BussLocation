@@ -2,22 +2,20 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.BaseActivity;
-import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.ActivityMainBinding;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +33,9 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
     private ActivityMainBinding mBinding;
 
-
     private MainActivityViewModel mViewModel;
+
+
 
     @Inject
     PermissionManager mPermissionManager;
@@ -59,6 +58,7 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         mBinding.viewPager.setAdapter(
                 new ViewPagerAdapter(getSupportFragmentManager(), 0)
         );
+
 
 
         NavigationAdapter.getInstance(mBinding);
@@ -93,5 +93,21 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Really Exit?")
+                .setMessage("Are you sure you want to exit?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .create().show();
     }
 }

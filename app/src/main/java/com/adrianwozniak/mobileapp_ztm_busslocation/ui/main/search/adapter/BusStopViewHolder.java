@@ -14,19 +14,19 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.util.StringServices;
 public class BusStopViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     private static final String TAG = "BusStopViewHolder";
 
-    OnRecycleViewClickListener mClickListener;
+    IOnRecycleViewClickListener mClickListener;
 
     TextView displayName, displayDistance, displayZoneName, hideStopId;
 
 
-    public BusStopViewHolder(@NonNull View itemView, OnRecycleViewClickListener listener) {
+    public BusStopViewHolder(@NonNull View itemView, IOnRecycleViewClickListener listener) {
         super(itemView);
 
         this.mClickListener = listener;
 
-        displayName = itemView.findViewById(R.id.display_name_list_item);
-        displayZoneName = itemView.findViewById(R.id.display_zone_list_item);
-        displayDistance = itemView.findViewById(R.id.display_distance_list_item);
+        displayName = itemView.findViewById(R.id.display_name_details_item);
+        displayZoneName = itemView.findViewById(R.id.display_zone_details_item);
+        displayDistance = itemView.findViewById(R.id.display_distance_details_item);
         hideStopId = itemView.findViewById(R.id.hide_stopId);
 
         itemView.setOnClickListener(this);

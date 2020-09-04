@@ -1,6 +1,5 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +27,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<Distance<VehicleDelay>> mVehicleDelays = new ArrayList<>();
     private boolean mIsLoading = false;
 
-    private OnRecycleViewClickListener mClickListener;
+    private IOnRecycleViewClickListener mClickListener;
 
-    public RecyclerViewAdapter(OnRecycleViewClickListener clickListener) {
+    public RecyclerViewAdapter(IOnRecycleViewClickListener clickListener) {
         this.mClickListener = clickListener;
     }
 
@@ -83,9 +82,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
-    public void clearBusStops(){
-        mBusStops.clear();
-    }
 
     public void setLoading(){
         mBusStops.clear();

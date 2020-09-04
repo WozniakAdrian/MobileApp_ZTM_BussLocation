@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.FragmentMapBinding;
-import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
 
 
@@ -47,6 +46,7 @@ public class MapFragment extends DaggerFragment {
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(MapFragmentViewModel.class);
     }
+
 
 
 }

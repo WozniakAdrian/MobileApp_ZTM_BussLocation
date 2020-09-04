@@ -4,6 +4,7 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search;
 import android.location.Address;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,31 +21,32 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.FragmentSearchBi
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsResponse;
+import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
-import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.OnRecycleViewClickListener;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.IOnRecycleViewClickListener;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.RecyclerViewAdapter;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.StringServices;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.VerticalSpacingItemDecorator;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
 
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.GONE;
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.VISIBLE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
 
 
-public class SearchFragment extends DaggerFragment implements OnRecycleViewClickListener {
+public class SearchFragment extends DaggerFragment implements IOnRecycleViewClickListener {
     private static final String TAG = "SearchFragment";
 
     private FragmentSearchBinding mBinding;
@@ -54,6 +56,7 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
     private RecyclerViewAdapter mAdapter;
 
     private List<Distance<BusStop>> mDistanceBusStop = new ArrayList<>();
+    private List<BusStop> mBusStop;
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
@@ -71,6 +74,20 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        //ON BACK PRESS LOGIC
+        view.setOnKeyListener((v, keyCode, event) -> {
+            Log.i(TAG, "keyCode: " + keyCode);
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                if (mViewModel.mDetailsState == VISIBLE) {
+                    hideBusStopDetails();
+                    return true;
+                }
+            }
+            return false;
+        });
+
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(SearchFragmentViewModel.class);
 
@@ -78,6 +95,7 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
 
         mViewModel.getBusStops();
 
+        hideBusStopDetails();
         initRecyclerView();
         initSearchView();
         initLocation();
@@ -108,6 +126,8 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
                                 });
 
                         mAdapter.setBusStops(mDistanceBusStop);
+
+
                         break;
                     }
                     case LOADING: {
@@ -151,7 +171,30 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
             }
         });
 
-
+        //OBSERVE DELAYS
+        mViewModel.observeEstimatedDelay().observe(this, new Observer<Resource<EstimatedDelayResponse>>() {
+            @Override
+            public void onChanged(Resource<EstimatedDelayResponse> estimatedDelays) {
+                switch (estimatedDelays.status) {
+                    case SUCCESS: {
+                        Log.d(TAG, "onChanged: success edt");
+                        estimatedDelays.data.getVehicleDelays().stream().forEach(
+                                item -> Log.d(TAG, "onChanged: " + item.toString())
+                        );
+                        break;
+                    }
+                    case LOADING: {
+                        Log.d(TAG, "onChanged: loading edt");
+                        break;
+                    }
+                    case ERROR: {
+                        //todo: poinformowac uzytkownika o błędzie
+                        Log.d(TAG, "onChanged: error");
+                        break;
+                    }
+                }
+            }
+        });
 
 
     }
@@ -170,7 +213,15 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
 
     @Override
     public void onStopClick(String stopId) {
+        Optional<Distance<BusStop>> first = mDistanceBusStop.stream().filter(busStop -> {
+            if (busStop.data.getStopId().toString().equals(stopId))
+                return true;
+            return false;
+        }).findFirst();
 
+        first.ifPresent(busStopDistance -> showBusStopDetails(busStopDistance));
+        mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
+//        showBusStopDetails(first.get());
     }
 
     @Override
@@ -196,6 +247,35 @@ public class SearchFragment extends DaggerFragment implements OnRecycleViewClick
         });
 
     }
+
+    private void showBusStopDetails(Distance<BusStop> busStop) {
+        if (busStop != null) {
+                mBinding.toolBar.setVisibility(View.GONE);
+
+                mViewModel.mDetailsState = VISIBLE;
+                mBinding.details.setVisibility(View.VISIBLE);
+
+                mBinding.displayNameDetailsItem.setVisibility(View.VISIBLE);
+                mBinding.displayZoneDetailsItem.setVisibility(View.VISIBLE);
+                mBinding.displayDistanceDetailsItem.setVisibility(View.VISIBLE);
+
+                mBinding.displayNameDetailsItem.setText(StringServices.getDisplayName(busStop.data));
+                mBinding.displayZoneDetailsItem.setText(busStop.data.getZoneName());
+                mBinding.displayDistanceDetailsItem.setText(StringServices.getDistance(busStop));
+        }
+    }
+
+    private void hideBusStopDetails() {
+            mBinding.toolBar.setVisibility(View.VISIBLE);
+
+            mViewModel.mDetailsState = GONE;
+            mBinding.details.setVisibility(View.GONE);
+
+            mBinding.displayNameDetailsItem.setVisibility(View.GONE);
+            mBinding.displayZoneDetailsItem.setVisibility(View.GONE);
+            mBinding.displayDistanceDetailsItem.setVisibility(View.GONE);
+    }
+
 
 }
 
