@@ -80,10 +80,11 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         view.setOnKeyListener((v, keyCode, event) -> {
             Log.i(TAG, "keyCode: " + keyCode);
             if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                if (mViewModel.mDetailsState == VISIBLE) {
+                if (mBinding.details.getVisibility() == View.VISIBLE) {
                     hideBusStopDetails();
                     return true;
                 }
+
             }
             return false;
         });
@@ -234,46 +235,51 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
+                mAdapter.getFilter().filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
+              
                 return false;
 
             }
         });
+        
+        mBinding.searchView.setOnCloseListener(() -> {
 
+            mViewModel.getBusStops();
+            return true;
+        });
     }
 
     private void showBusStopDetails(Distance<BusStop> busStop) {
         if (busStop != null) {
-                mBinding.toolBar.setVisibility(View.GONE);
+            mBinding.toolBar.setVisibility(View.GONE);
 
-                mViewModel.mDetailsState = VISIBLE;
-                mBinding.details.setVisibility(View.VISIBLE);
+            mViewModel.mDetailsState = VISIBLE;
+            mBinding.details.setVisibility(View.VISIBLE);
 
-                mBinding.displayNameDetailsItem.setVisibility(View.VISIBLE);
-                mBinding.displayZoneDetailsItem.setVisibility(View.VISIBLE);
-                mBinding.displayDistanceDetailsItem.setVisibility(View.VISIBLE);
+            mBinding.displayNameDetailsItem.setVisibility(View.VISIBLE);
+            mBinding.displayZoneDetailsItem.setVisibility(View.VISIBLE);
+            mBinding.displayDistanceDetailsItem.setVisibility(View.VISIBLE);
 
-                mBinding.displayNameDetailsItem.setText(StringServices.getDisplayName(busStop.data));
-                mBinding.displayZoneDetailsItem.setText(busStop.data.getZoneName());
-                mBinding.displayDistanceDetailsItem.setText(StringServices.getDistance(busStop));
+            mBinding.displayNameDetailsItem.setText(StringServices.getDisplayName(busStop.data));
+            mBinding.displayZoneDetailsItem.setText(busStop.data.getZoneName());
+            mBinding.displayDistanceDetailsItem.setText(StringServices.getDistance(busStop));
         }
     }
 
     private void hideBusStopDetails() {
-            mBinding.toolBar.setVisibility(View.VISIBLE);
+        mBinding.toolBar.setVisibility(View.VISIBLE);
 
-            mViewModel.mDetailsState = GONE;
-            mBinding.details.setVisibility(View.GONE);
+        mViewModel.mDetailsState = GONE;
+        mBinding.details.setVisibility(View.GONE);
 
-            mBinding.displayNameDetailsItem.setVisibility(View.GONE);
-            mBinding.displayZoneDetailsItem.setVisibility(View.GONE);
-            mBinding.displayDistanceDetailsItem.setVisibility(View.GONE);
+        mBinding.displayNameDetailsItem.setVisibility(View.GONE);
+        mBinding.displayZoneDetailsItem.setVisibility(View.GONE);
+        mBinding.displayDistanceDetailsItem.setVisibility(View.GONE);
     }
 
 

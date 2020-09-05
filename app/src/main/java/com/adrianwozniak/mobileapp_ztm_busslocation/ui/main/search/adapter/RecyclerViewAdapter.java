@@ -1,8 +1,11 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,9 +16,10 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.VehicleDelay;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     private static final String TAG = "RecyclerViewAdapter";
 
 
@@ -42,7 +46,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_item, parent, false);
                 return new BusStopViewHolder(view, mClickListener);
             }
-            case LOADING_TYPE:{
+            case LOADING_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_loading_item, parent, false);
                 return new LoadingViewHolder(view);
             }
@@ -65,10 +69,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (mBusStops.size() > 0) {
             return mBusStops.size();
         }
-        if (mIsLoading){
+        if (mIsLoading) {
             return 1;
-        }
-        else {
+        } else {
             return 0;
         }
 
@@ -77,14 +80,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void setBusStops(List<Distance<BusStop>> list) {
         mBusStops = list;
+
+
         mVehicleDelays.clear();
         mIsLoading = false;
         notifyDataSetChanged();
     }
 
 
-    public void setLoading(){
+    public void setLoading() {
         mBusStops.clear();
+
         mVehicleDelays.clear();
         mIsLoading = true;
         notifyDataSetChanged();
@@ -95,14 +101,48 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (mBusStops.size() > 0 && mIsLoading == false) {
             return STOP_TYPE;
         }
-        if(mIsLoading){
+        if (mIsLoading) {
             return LOADING_TYPE;
-        }
-
-
-        else{
+        } else {
             return 99;
         }
+    }
+
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected android.widget.Filter.FilterResults performFiltering(CharSequence constraint) {
+
+                List<Distance<BusStop>> filtered = new ArrayList<>();
+
+                if(constraint == null || constraint.length() == 0 ){
+                   filtered.addAll(mBusStops);
+                }else{
+                    String pattern = constraint.toString().toLowerCase().trim();
+
+                    mBusStops.stream().forEach(item -> {
+                        if(item.data.getStopDesc().toLowerCase().contains(pattern)){
+                            filtered.add(item);
+                        }
+                    });
+
+                }
+
+                android.widget.Filter.FilterResults results = new Filter.FilterResults();
+                results.values = filtered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, android.widget.Filter.FilterResults
+            results) {
+                mBusStops.clear();
+                mBusStops.addAll((List<Distance<BusStop>>) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
 
