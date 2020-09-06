@@ -1,8 +1,11 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.util;
 
 
+import android.util.Log;
+
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.VehicleDelay;
 
 import java.text.DecimalFormat;
 
@@ -94,5 +97,118 @@ public class StringServices {
 
         return list;
     }
+
+
+
+    public static String getDelayString(VehicleDelay vehicle){
+
+        int delay = vehicle.getDelayInSeconds();
+        String outputString = "";
+
+//        if(delay > 0 ){
+//            outputString = " Opóźniony ";
+//        }else{
+//            outputString = " Przyśpieszony ";
+//
+//
+//        }
+
+        int minutes = 0;
+        int seconds = 0;
+
+        if(delay <=  0)  delay *=  -1;
+
+        if(delay >= 60) {
+            minutes = delay / 60;
+            seconds = delay%60;
+
+            outputString += minutes + ":";
+
+            if(seconds < 10){
+                outputString += "0"+ seconds + "min";
+            }else{
+                outputString += seconds + "min";
+            }
+        }else{
+            outputString += delay + "s";
+        }
+
+
+
+        return outputString;
+    }
+
+    public static String getDelayWarningString(VehicleDelay vehicle) {
+
+        if (vehicle.getDelayInSeconds() < 30 && vehicle.getDelayInSeconds() > -30) {
+            return "ROZKŁADOWO";
+        }
+
+        if(vehicle.getDelayInSeconds() < 0 ){
+            return "PRZYŚPIESZONY";
+        }else {
+            return "OPÓŹNIONY";
+        }
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -4,6 +4,7 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search;
 import android.location.Address;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,6 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +43,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.GONE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.VISIBLE;
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.SearchFragmentState.BUSSTOP;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
 
 
@@ -92,9 +93,11 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(SearchFragmentViewModel.class);
 
-        subscribeObservers();
+        subscribeFragmentState();
 
+        mViewModel.setFragmentState(BUSSTOP);
         mViewModel.getBusStops();
+
 
         hideBusStopDetails();
         initRecyclerView();
@@ -110,9 +113,40 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         }
     }
 
+  
 
-    private void subscribeObservers() {
 
+    private void subscribeLocation(){
+        //OBSERVE LOCATION
+        mViewModel.observeLocation().observe(SearchFragment.this , new Observer<Resource<Address>>() {
+            @Override
+            public void onChanged(Resource<Address> address) {
+                switch (address.status) {
+                    case SUCCESS: {
+                        Log.d(TAG, "onChanged: LOCATION");
+
+                            mDistanceBusStop = mViewModel.calculateDistanceAndSort(address, mDistanceBusStop);
+                            mAdapter.setBusStops(mDistanceBusStop);
+
+                        break;
+                    }
+                    case LOADING: {
+
+
+                        break;
+                    }
+                    case ERROR: {
+                        //todo: poinformowac uzytkownika o błędzie
+                        Log.d(TAG, "onChanged: error");
+                        break;
+                    }
+
+                }
+
+            }
+        });
+    }
+    private void subscribeBusStop(){
         //OBSERVE BUS STOP FROM API
         mViewModel.observeBusStops().observe(this, new Observer<Resource<BusStopsResponse>>() {
             @Override
@@ -126,9 +160,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                                     mDistanceBusStop.add(Distance.setDistance(busStop, 0));
                                 });
 
-                        mAdapter.setBusStops(mDistanceBusStop);
-
-
+                        subscribeLocation();
                         break;
                     }
                     case LOADING: {
@@ -144,47 +176,26 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                 }
             }
         });
-
-
-        //OBSERVE LOCATION
-        mViewModel.observeLocation().observe(this, new Observer<Resource<Address>>() {
-            @Override
-            public void onChanged(Resource<Address> address) {
-                switch (address.status) {
-                    case SUCCESS: {
-                        mDistanceBusStop = mViewModel.calculateDistanceAndSort(address, mDistanceBusStop);
-                        mAdapter.setBusStops(mDistanceBusStop);
-                        break;
-                    }
-                    case LOADING: {
-
-
-                        break;
-                    }
-                    case ERROR: {
-                        //todo: poinformowac uzytkownika o błędzie
-                        Log.d(TAG, "onChanged: error");
-                        break;
-                    }
-
-                }
-
-            }
-        });
-
+    }
+    private void subscribeEstimatedDelays(){
         //OBSERVE DELAYS
         mViewModel.observeEstimatedDelay().observe(this, new Observer<Resource<EstimatedDelayResponse>>() {
             @Override
             public void onChanged(Resource<EstimatedDelayResponse> estimatedDelays) {
                 switch (estimatedDelays.status) {
                     case SUCCESS: {
+
                         Log.d(TAG, "onChanged: success edt");
                         estimatedDelays.data.getVehicleDelays().stream().forEach(
                                 item -> Log.d(TAG, "onChanged: " + item.toString())
                         );
+
+                        mAdapter.setVehicles(estimatedDelays.data.getVehicleDelays());
+
                         break;
                     }
                     case LOADING: {
+                        mAdapter.setLoading();
                         Log.d(TAG, "onChanged: loading edt");
                         break;
                     }
@@ -196,8 +207,44 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                 }
             }
         });
+    }
 
+    private void subscribeFragmentState() {
+        //OBSERVE FRAGMENT STATE
+        mViewModel.observeFragmentState().observe(this, new Observer<SearchFragmentViewModel.SearchFragmentState>() {
+            @Override
+            public void onChanged(SearchFragmentViewModel.SearchFragmentState searchFragmentState) {
+                switch (searchFragmentState) {
+                    case BUSSTOP:{
+                        Log.d(TAG, "onChanged: BUS STOP");
 
+                        subscribeBusStop();
+                        mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
+                        
+                        break;
+                    }
+
+                    case VEHICLE:{
+                        mViewModel.observeLocation().removeObservers(SearchFragment.this);
+                        mViewModel.observeBusStops().removeObservers(SearchFragment.this);
+
+                        subscribeEstimatedDelays();
+
+                        break;
+                    }
+
+                    case SEARCH:{
+                        mViewModel.observeLocation().removeObservers(SearchFragment.this);
+                        mViewModel.observeBusStops().removeObservers(SearchFragment.this);
+                        mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
+
+                        //todo: filtrowanie search view tutaj
+
+                        break;
+                    }
+                }
+            }
+        });
     }
 
 
@@ -221,8 +268,9 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         }).findFirst();
 
         first.ifPresent(busStopDistance -> showBusStopDetails(busStopDistance));
+
         mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
-//        showBusStopDetails(first.get());
+
     }
 
     @Override
@@ -259,6 +307,8 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             mBinding.toolBar.setVisibility(View.GONE);
 
             mViewModel.mDetailsState = VISIBLE;
+            mViewModel.setFragmentState(SearchFragmentViewModel.SearchFragmentState.VEHICLE);
+
             mBinding.details.setVisibility(View.VISIBLE);
 
             mBinding.displayNameDetailsItem.setVisibility(View.VISIBLE);
@@ -268,11 +318,15 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             mBinding.displayNameDetailsItem.setText(StringServices.getDisplayName(busStop.data));
             mBinding.displayZoneDetailsItem.setText(busStop.data.getZoneName());
             mBinding.displayDistanceDetailsItem.setText(StringServices.getDistance(busStop));
+
         }
     }
 
     private void hideBusStopDetails() {
         mBinding.toolBar.setVisibility(View.VISIBLE);
+
+        mViewModel.setFragmentState(BUSSTOP);
+
 
         mViewModel.mDetailsState = GONE;
         mBinding.details.setVisibility(View.GONE);

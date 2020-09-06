@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.LiveDataReactiveStreams;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
@@ -37,6 +38,8 @@ public class SearchFragmentViewModel extends ViewModel {
     private final EstimatedDelayRepository mEstimatedDelayRepository;
     private MediatorLiveData<Resource<Address>> mAddress = new MediatorLiveData<>();
 
+    private MutableLiveData<SearchFragmentState> mFragmentState = new MutableLiveData<>();
+
 
     public DetailsState mDetailsState;
 
@@ -50,6 +53,8 @@ public class SearchFragmentViewModel extends ViewModel {
         mEstimatedDelayRepository = estimatedDelayRepository;
         mBusStopRepository = busStopRepository;
         mLocation = location;
+
+        setFragmentState(SearchFragmentState.BUSSTOP);
     }
 
     public LiveData<Resource<BusStopsResponse>> observeBusStops() {
@@ -60,6 +65,14 @@ public class SearchFragmentViewModel extends ViewModel {
         return mAddress;
     }
 
+    public LiveData<Resource<EstimatedDelayResponse>> observeEstimatedDelay() {
+        return mEstimatedDelayRepository.observeEstimatedDelayResponse();
+    }
+
+    public LiveData<SearchFragmentState> observeFragmentState(){
+        return mFragmentState;
+    }
+
     public void getBusStops() {
         mBusStopRepository.getBusStop();
     }
@@ -67,11 +80,6 @@ public class SearchFragmentViewModel extends ViewModel {
     public void getEstimatedDelaysBy(int stopId){
         mEstimatedDelayRepository.getEstimatedDelayResponse(stopId);
     }
-
-    public LiveData<Resource<EstimatedDelayResponse>> observeEstimatedDelay() {
-        return mEstimatedDelayRepository.observeEstimatedDelayResponse();
-    }
-
 
     public void getLocation() {
         mAddress.setValue(Resource.loading(null));
@@ -103,6 +111,10 @@ public class SearchFragmentViewModel extends ViewModel {
                 mAddress.setValue(address);
             }
         });
+    }
+
+    public void setFragmentState(SearchFragmentState state){
+        mFragmentState.setValue(state);
     }
 
 
@@ -159,4 +171,5 @@ public class SearchFragmentViewModel extends ViewModel {
 
 
     public enum DetailsState { VISIBLE , GONE};
+    public enum SearchFragmentState {BUSSTOP, SEARCH, VEHICLE}
 }
