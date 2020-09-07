@@ -77,6 +77,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
+
         //ON BACK PRESS LOGIC
         view.setOnKeyListener((v, keyCode, event) -> {
             Log.i(TAG, "keyCode: " + keyCode);
@@ -85,10 +86,10 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                     hideBusStopDetails();
                     return true;
                 }
-
             }
             return false;
         });
+
 
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(SearchFragmentViewModel.class);
@@ -104,16 +105,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         initSearchView();
         initLocation();
     }
-
-    private void initLocation() {
-        if (EasyPermissions.hasPermissions(getContext(), PERMISSION_LOCATION_ARRAY)) {
-            mViewModel.getLocation();
-        } else {
-            PermissionManager.requestPermissions(this);
-        }
-    }
-
-  
 
 
     private void subscribeLocation(){
@@ -208,7 +199,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             }
         });
     }
-
     private void subscribeFragmentState() {
         //OBSERVE FRAGMENT STATE
         mViewModel.observeFragmentState().observe(this, new Observer<SearchFragmentViewModel.SearchFragmentState>() {
@@ -258,6 +248,37 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.recyclerView.setAdapter(mAdapter);
 
     }
+    private void initLocation() {
+        if (EasyPermissions.hasPermissions(getContext(), PERMISSION_LOCATION_ARRAY)) {
+            mViewModel.getLocation();
+        } else {
+            PermissionManager.requestPermissions(this);
+        }
+    }
+    private void initSearchView() {
+
+        mBinding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                return false;
+
+            }
+        });
+
+        mBinding.searchView.setOnCloseListener(() -> {
+
+            mViewModel.getBusStops();
+            return true;
+        });
+    }
+
 
     @Override
     public void onStopClick(String stopId) {
@@ -272,35 +293,11 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
 
     }
-
     @Override
     public void onVehicleClick(String vehicleId) {
 
     }
 
-    private void initSearchView() {
-
-        mBinding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-              
-                return false;
-
-            }
-        });
-        
-        mBinding.searchView.setOnCloseListener(() -> {
-
-            mViewModel.getBusStops();
-            return true;
-        });
-    }
 
     private void showBusStopDetails(Distance<BusStop> busStop) {
         if (busStop != null) {
@@ -321,7 +318,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
         }
     }
-
     private void hideBusStopDetails() {
         mBinding.toolBar.setVisibility(View.VISIBLE);
 
