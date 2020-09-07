@@ -1,17 +1,18 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.di.main;
 
-import com.adrianwozniak.mobileapp_ztm_busslocation.models.VehicleDelay;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.EstimatedDelayApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.VehicleApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.BusStopRepository;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.EstimatedDelayRepository;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.VehicleRepository;
+import com.adrianwozniak.mobileapp_ztm_busslocation.repository.LocationRepository;
 
 import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Observable;
 import retrofit2.Retrofit;
 
 @Module
@@ -46,5 +47,11 @@ public abstract class MainActivityModule {
     static VehicleRepository vehicleRepository(VehicleApi api){
         return new VehicleRepository(api);
     }
+
+    @Provides
+    static LocationRepository locationRepository(Observable location){
+        return new LocationRepository(location);
+    }
+
 
 }

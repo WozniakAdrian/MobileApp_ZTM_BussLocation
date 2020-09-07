@@ -12,10 +12,14 @@ import android.util.Log;
 import android.view.View;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.BaseActivity;
+import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.ActivityMainBinding;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.map.MapFragment;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +32,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
 
 
-public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks, SearchFragment.IStateChanged {
     private static final String TAG = "MainActivity";
 
     private ActivityMainBinding mBinding;
@@ -109,5 +113,13 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
                     }
                 })
                 .create().show();
+    }
+
+
+    @Override
+    public void sendState(String s) {
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+        MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        f.displayReceivedData(s);
     }
 }

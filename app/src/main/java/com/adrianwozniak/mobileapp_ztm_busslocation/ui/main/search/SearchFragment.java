@@ -1,9 +1,10 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.location.Address;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -50,6 +51,8 @@ import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMIS
 public class SearchFragment extends DaggerFragment implements IOnRecycleViewClickListener {
     private static final String TAG = "SearchFragment";
 
+
+
     private FragmentSearchBinding mBinding;
 
     private SearchFragmentViewModel mViewModel;
@@ -57,10 +60,11 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     private RecyclerViewAdapter mAdapter;
 
     private List<Distance<BusStop>> mDistanceBusStop = new ArrayList<>();
-    private List<BusStop> mBusStop;
+
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
+
 
 
     @Nullable
@@ -90,7 +94,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             return false;
         });
 
-
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(SearchFragmentViewModel.class);
 
@@ -104,6 +107,8 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         initRecyclerView();
         initSearchView();
         initLocation();
+
+
     }
 
 
@@ -204,13 +209,17 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mViewModel.observeFragmentState().observe(this, new Observer<SearchFragmentViewModel.SearchFragmentState>() {
             @Override
             public void onChanged(SearchFragmentViewModel.SearchFragmentState searchFragmentState) {
+
+
+                mStateChanged.sendState(searchFragmentState.toString());
+
                 switch (searchFragmentState) {
                     case BUSSTOP:{
                         Log.d(TAG, "onChanged: BUS STOP");
 
                         subscribeBusStop();
                         mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
-                        
+
                         break;
                     }
 
@@ -333,6 +342,40 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    public interface IStateChanged{
+        public void sendState(String s);
+    }
+    IStateChanged mStateChanged;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mStateChanged = (IStateChanged) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement TextClicked");
+        }
+    }
+
+
+    @Override
+    public void onDetach() {
+        mStateChanged = null; // => avoid leaking, thanks @Deepscorn
+        super.onDetach();
+    }
 }
 
 
