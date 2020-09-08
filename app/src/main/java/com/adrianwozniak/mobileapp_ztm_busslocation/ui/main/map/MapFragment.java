@@ -1,27 +1,40 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.map;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Address;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.FragmentMapBinding;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Vehicle;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.VehicleResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.BitMapConventer;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -61,8 +74,8 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
     private int mLocationUpdateCount = 0;
 
     private List<Vehicle> mVehicles;
-    private Integer mCurrentVehicleID = 0;
-
+    private int mCurrentVehicleID = 0;
+    private BusStop mCurrentBusStop;
 
     private final static int VEHICLES_UPDATE_INTERVAL = 20;
 
@@ -189,26 +202,31 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
                         Log.d(TAG, "onChanged: current vehicle  " + mCurrentVehicleID);
                         if (mCurrentVehicleID != 0) {
 
-                            Optional<Vehicle> first = vehicleResponseResource.data.getVehicles()
+                            vehicleResponseResource.data.getVehicles()
                                     .stream()
-                                    .filter(vehicle -> (int)vehicle.getVehicleId() == mCurrentVehicleID)
-                                    .findFirst();
+                                    .filter(vehicle -> vehicle.getVehicleId() == mCurrentVehicleID)
+                                    .findFirst()
+                                    .ifPresent(vehicle -> {
+                                        mMap.clear();
 
-                            first.ifPresent(vehicle -> {
+                                        mMap.addMarker(new MarkerOptions()
+                                                .position(new LatLng(
+                                                        vehicle.getLat(),
+                                                        vehicle.getLon()
+                                                ))
+                                                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_bus)))
+                                                .title(vehicle.getLine()));
 
-                                Log.d(TAG, "onChanged: is present");
-                                BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_bus);
-                                MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(
-                                        vehicle.getLat(),
-                                        vehicle.getLon()
-                                ))
-                                        .title("Current Location")
-                                        .snippet("Thinking of finding some thing...")
-                                        .icon(icon);
+                                        mMap.addMarker(new MarkerOptions()
+                                                .position(new LatLng(
+                                                        mCurrentBusStop.getStopLat(),
+                                                        mCurrentBusStop.getStopLon()
+                                                ))
+                                                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_arrow)))
+                                                .title(mCurrentBusStop.getStopDesc()));
 
-                                mMap.addMarker(markerOptions);
-                            });
 
+                                    });
                         }
 
 
@@ -250,8 +268,17 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
         }
     }
 
-    public void setCurrentBussStation(String id) {
-        Log.d(TAG, "setCurrentBussStation: ID " + id);
+    public void setCurrentBussStation(BusStop stop) {
+        mMap.clear();
+        mCurrentBusStop = stop;
+        mCurrentVehicleID=0;
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(
+                        mCurrentBusStop.getStopLat(),
+                        mCurrentBusStop.getStopLon()
+                ))
+                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_arrow)))
+                .title(mCurrentBusStop.getStopDesc()));
     }
 
     public void setCurrentVehicle(String id) {
@@ -259,4 +286,6 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
 
         Log.d(TAG, "setCurrentVehicle: ID " + id);
     }
+
+
 }

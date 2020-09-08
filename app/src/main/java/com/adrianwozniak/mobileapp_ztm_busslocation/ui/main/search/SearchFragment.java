@@ -56,7 +56,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
     public interface ICommunicationInterface {
         void sendState(IUiAppState state);
-        void sendBusStopID(String id);
+        void sendBusStopID(BusStop busStop);
         void sendVehicleID(String id);
 
     }
@@ -303,11 +303,14 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             return false;
         }).findFirst();
 
-        first.ifPresent(busStopDistance -> showBusStopDetails(busStopDistance));
+        first.ifPresent(busStopDistance -> {
+            showBusStopDetails(busStopDistance);
+            mICommunicationInterface.sendBusStopID(first.get().data);
+        });
 
         mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
 
-        mICommunicationInterface.sendBusStopID(stopId);
+
 
     }
     @Override

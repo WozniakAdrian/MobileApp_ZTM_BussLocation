@@ -14,6 +14,7 @@ import android.view.View;
 import com.adrianwozniak.mobileapp_ztm_busslocation.BaseActivity;
 import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.ActivityMainBinding;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.map.MapFragment;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
@@ -127,10 +128,10 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     }
 
     @Override
-    public void sendBusStopID(String id) {
+    public void sendBusStopID(BusStop stop) {
         String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
         MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
-        f.setCurrentBussStation(id);
+        f.setCurrentBussStation(stop);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class VehicleDelaysViewHolder extends RecyclerView.ViewHolder implements 
         displayDescription2.setText("Planowy przyjazd: " + vehicle.getTheoreticalTime() + ", szacowany przyjazd: " + vehicle.getEstimatedTime());
 
 
-        hideStopId.setText(vehicle.getVehicleCode().toString());
+        hideStopId.setText(vehicle.getVehicleId().toString());
     }
 
     @Override

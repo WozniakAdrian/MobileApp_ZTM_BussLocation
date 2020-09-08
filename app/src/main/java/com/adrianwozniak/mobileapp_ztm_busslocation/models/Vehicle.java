@@ -24,7 +24,7 @@ public class Vehicle {
     private String vehicleService;
     @SerializedName("VehicleId")
     @Expose
-    private Integer vehicleId;
+    private int vehicleId;
     @SerializedName("Speed")
     @Expose
     private Integer speed;
@@ -44,7 +44,7 @@ public class Vehicle {
     public Vehicle() {
     }
 
-    public Vehicle(String dataGenerated, String line, String route, String vehicleCode, String vehicleService, Integer vehicleId, Integer speed, Integer delay, Double lat, Double lon, Integer gPSQuality) {
+    public Vehicle(String dataGenerated, String line, String route, String vehicleCode, String vehicleService, int vehicleId, Integer speed, Integer delay, Double lat, Double lon, Integer gPSQuality) {
         this.dataGenerated = dataGenerated;
         this.line = line;
         this.route = route;
@@ -98,11 +98,11 @@ public class Vehicle {
         this.vehicleService = vehicleService;
     }
 
-    public Integer getVehicleId() {
+    public int getVehicleId() {
         return vehicleId;
     }
 
-    public void setVehicleId(Integer vehicleId) {
+    public void setVehicleId(int vehicleId) {
         this.vehicleId = vehicleId;
     }
 
