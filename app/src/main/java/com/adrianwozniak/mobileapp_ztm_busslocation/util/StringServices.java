@@ -145,9 +145,9 @@ public class StringServices {
         }
 
         if(vehicle.getDelayInSeconds() < 0 ){
-            return "PRZYŚPIESZONY";
+            return "PRZYŚPIESZONY o: " + StringServices.getDelayString(vehicle);
         }else {
-            return "OPÓŹNIONY";
+            return "OPÓŹNIONY o: " +StringServices.getDelayString(vehicle);
         }
 
     }

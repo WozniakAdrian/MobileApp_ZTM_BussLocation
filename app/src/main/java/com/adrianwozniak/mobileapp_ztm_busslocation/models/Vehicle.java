@@ -3,6 +3,8 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 public class Vehicle {
 
     @SerializedName("DataGenerated")
@@ -160,4 +162,6 @@ public class Vehicle {
                 ", gPSQuality=" + gPSQuality +
                 '}';
     }
+
+
 }

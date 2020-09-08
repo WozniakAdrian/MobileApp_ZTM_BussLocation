@@ -1,7 +1,6 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.IOnRecycleViewClickListener;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.RecyclerViewAdapter;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
@@ -42,9 +42,11 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.BUSSTOP;
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.VEHICLE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.GONE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.VISIBLE;
-import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.SearchFragmentState.BUSSTOP;
+
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
 
 
@@ -52,6 +54,13 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     private static final String TAG = "SearchFragment";
 
 
+    public interface ICommunicationInterface {
+        void sendState(IUiAppState state);
+        void sendBusStopID(String id);
+        void sendVehicleID(String id);
+
+    }
+    private ICommunicationInterface mICommunicationInterface;
 
     private FragmentSearchBinding mBinding;
 
@@ -206,14 +215,11 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     }
     private void subscribeFragmentState() {
         //OBSERVE FRAGMENT STATE
-        mViewModel.observeFragmentState().observe(this, new Observer<SearchFragmentViewModel.SearchFragmentState>() {
+        mViewModel.observeFragmentState().observe(this, new Observer<IUiAppState>() {
             @Override
-            public void onChanged(SearchFragmentViewModel.SearchFragmentState searchFragmentState) {
-
-
-                mStateChanged.sendState(searchFragmentState.toString());
-
-                switch (searchFragmentState) {
+            public void onChanged(IUiAppState uiAppState) {
+                mICommunicationInterface.sendState(uiAppState);
+                switch (uiAppState) {
                     case BUSSTOP:{
                         Log.d(TAG, "onChanged: BUS STOP");
 
@@ -301,10 +307,12 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
         mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
 
+        mICommunicationInterface.sendBusStopID(stopId);
+
     }
     @Override
     public void onVehicleClick(String vehicleId) {
-
+        mICommunicationInterface.sendVehicleID(vehicleId);
     }
 
 
@@ -313,7 +321,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             mBinding.toolBar.setVisibility(View.GONE);
 
             mViewModel.mDetailsState = VISIBLE;
-            mViewModel.setFragmentState(SearchFragmentViewModel.SearchFragmentState.VEHICLE);
+            mViewModel.setFragmentState(VEHICLE);
 
             mBinding.details.setVisibility(View.VISIBLE);
 
@@ -354,16 +362,14 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
 
 
-    public interface IStateChanged{
-        public void sendState(String s);
-    }
-    IStateChanged mStateChanged;
+
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mStateChanged = (IStateChanged) getActivity();
+            mICommunicationInterface = (ICommunicationInterface) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement TextClicked");
@@ -373,7 +379,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
     @Override
     public void onDetach() {
-        mStateChanged = null; // => avoid leaking, thanks @Deepscorn
+        mICommunicationInterface = null; // => avoid leaking, thanks @Deepscorn
         super.onDetach();
     }
 }

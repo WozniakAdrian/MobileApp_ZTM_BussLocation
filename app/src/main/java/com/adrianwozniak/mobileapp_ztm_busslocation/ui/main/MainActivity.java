@@ -32,13 +32,14 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.PERMISSION_LOCATION_ARRAY;
 
 
-public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks, SearchFragment.IStateChanged {
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks, SearchFragment.ICommunicationInterface {
     private static final String TAG = "MainActivity";
 
     private ActivityMainBinding mBinding;
 
     private MainActivityViewModel mViewModel;
 
+    private MapFragment mMapFragment;
 
 
     @Inject
@@ -68,6 +69,8 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         NavigationAdapter.getInstance(mBinding);
 
         mPermissionManager.requestPermissions(this);
+
+
     }
 
     @Override
@@ -117,9 +120,23 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
 
     @Override
-    public void sendState(String s) {
+    public void sendState(IUiAppState state) {
         String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
         MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
-        f.displayReceivedData(s);
+        f.setUiState(state);
+    }
+
+    @Override
+    public void sendBusStopID(String id) {
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+        MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        f.setCurrentBussStation(id);
+    }
+
+    @Override
+    public void sendVehicleID(String id) {
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+        MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        f.setCurrentVehicle(id);
     }
 }

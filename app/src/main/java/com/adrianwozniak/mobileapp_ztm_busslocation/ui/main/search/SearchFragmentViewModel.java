@@ -1,10 +1,8 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search;
 
-import android.app.Application;
 import android.location.Address;
 import android.util.Log;
 
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -18,6 +16,7 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.repository.EstimatedDelayRep
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.LocationRepository;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.DistanceCalculator;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class SearchFragmentViewModel extends ViewModel {
     private final EstimatedDelayRepository mEstimatedDelayRepository;
     private final LocationRepository mLocationRepository;
 
-    private MutableLiveData<SearchFragmentState> mFragmentState = new MutableLiveData<>();
+    private MutableLiveData<IUiAppState> mFragmentState = new MutableLiveData<>();
 
 
     public DetailsState mDetailsState;
@@ -48,7 +47,7 @@ public class SearchFragmentViewModel extends ViewModel {
         mEstimatedDelayRepository = estimatedDelayRepository;
         mBusStopRepository = busStopRepository;
         mLocationRepository = locationRepository;
-        setFragmentState(SearchFragmentState.BUSSTOP);
+        setFragmentState(IUiAppState.BUSSTOP);
     }
 
     public LiveData<Resource<BusStopsResponse>> observeBusStops() {
@@ -60,7 +59,7 @@ public class SearchFragmentViewModel extends ViewModel {
     public LiveData<Resource<EstimatedDelayResponse>> observeEstimatedDelay() {
         return mEstimatedDelayRepository.observeEstimatedDelayResponse();
     }
-    public LiveData<SearchFragmentState> observeFragmentState(){
+    public LiveData<IUiAppState> observeFragmentState(){
         return mFragmentState;
     }
 
@@ -74,7 +73,7 @@ public class SearchFragmentViewModel extends ViewModel {
        mLocationRepository.getLocation();
     }
 
-    public void setFragmentState(SearchFragmentState state){
+    public void setFragmentState(IUiAppState state){
         mFragmentState.setValue(state);
 
     }
@@ -134,5 +133,5 @@ public class SearchFragmentViewModel extends ViewModel {
 
 
     public enum DetailsState { VISIBLE , GONE};
-    public enum SearchFragmentState {BUSSTOP, SEARCH, VEHICLE}
+
 }

@@ -26,7 +26,7 @@ public class VehicleDelaysViewHolder extends RecyclerView.ViewHolder implements 
         displayName = itemView.findViewById(R.id.display_name);
         displayDescription1 = itemView.findViewById(R.id.display_details1);
         displayDescription2 = itemView.findViewById(R.id.display_details2);
-        displayDelay = itemView.findViewById(R.id.display_delay);
+
         hideStopId = itemView.findViewById(R.id.hide_vehicleId);
 
         itemView.setOnClickListener(this);
@@ -38,8 +38,6 @@ public class VehicleDelaysViewHolder extends RecyclerView.ViewHolder implements 
         displayDescription1.setText(StringServices.getDelayWarningString(vehicle));
 
         displayDescription2.setText("Planowy przyjazd: " + vehicle.getTheoreticalTime() + ", szacowany przyjazd: " + vehicle.getEstimatedTime());
-
-        displayDelay.setText(StringServices.getDelayString(vehicle));
 
 
         hideStopId.setText(vehicle.getVehicleCode().toString());
