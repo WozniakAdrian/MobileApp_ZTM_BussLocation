@@ -24,10 +24,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int STOP_TYPE = 1;
     private static final int VEHICLES_TYPE = 2;
     private static final int LOADING_TYPE = 3;
+    private static final int ERROR_TYPE = 4;
 
     private List<Distance<BusStop>> mBusStops = new ArrayList<>();
     private List<VehicleDelay> mVehicleDelays = new ArrayList<>();
     private boolean mIsLoading = false;
+    private boolean mIsError = false;
 
     private IOnRecycleViewClickListener mClickListener;
 
@@ -51,6 +53,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case LOADING_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_loading_item, parent, false);
                 return new LoadingViewHolder(view);
+            }
+            case ERROR_TYPE: {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_error_item, parent, false);
+                return new ErrorViewHolder(view);
             }
         }
 
@@ -79,6 +85,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (mIsLoading) {
             return 1;
+        }
+        if (mIsError) {
+            return 1;
         } else {
             return 0;
         }
@@ -91,6 +100,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         mBusStops = list;
 
+        mIsError = false;
         mIsLoading = false;
         notifyDataSetChanged();
     }
@@ -100,6 +110,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         mVehicleDelays = list;
         mIsLoading = false;
+        mIsError = false;
         notifyDataSetChanged();
     }
 
@@ -108,7 +119,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mBusStops.clear();
 
         mVehicleDelays.clear();
+        mIsError = false;
         mIsLoading = true;
+
+        notifyDataSetChanged();
+    }
+
+    public void setError() {
+        mBusStops.clear();
+
+        mVehicleDelays.clear();
+        mIsLoading = false;
+        mIsError = true;
+
         notifyDataSetChanged();
     }
 
@@ -122,7 +145,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (mIsLoading) {
             return LOADING_TYPE;
-        } else {
+        }
+        if (mIsError) {
+            return ERROR_TYPE;
+        }
+        else {
             return 99;
         }
     }

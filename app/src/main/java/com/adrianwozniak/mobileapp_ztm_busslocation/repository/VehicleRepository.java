@@ -19,6 +19,8 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.VEHICLE_UPDATE_DELAY;
+
 
 public class VehicleRepository {
     private static final String TAG = "VehicleRepository";
@@ -44,7 +46,7 @@ public class VehicleRepository {
 
         final LiveData<Resource<VehicleResponse>> source = LiveDataReactiveStreams.fromPublisher(
                 mVehicleApi.getVehicle()
-                        .repeatWhen(o -> Flowable.timer(10, TimeUnit.SECONDS).repeat())
+                        .repeatWhen(o -> Flowable.timer(VEHICLE_UPDATE_DELAY, TimeUnit.SECONDS).repeat())
                         .subscribeOn(Schedulers.io())
                         .onErrorReturn(new Function<Throwable, VehicleResponse>() {
                             @Override

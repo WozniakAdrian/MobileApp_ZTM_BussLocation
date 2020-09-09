@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -56,10 +57,13 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
     public interface ICommunicationInterface {
         void sendState(IUiAppState state);
+
         void sendBusStopID(BusStop busStop);
+
         void sendVehicleID(String id);
 
     }
+
     private ICommunicationInterface mICommunicationInterface;
 
     private FragmentSearchBinding mBinding;
@@ -73,7 +77,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
-
 
 
     @Nullable
@@ -121,17 +124,18 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     }
 
 
-    private void subscribeLocation(){
+
+    private void subscribeLocation() {
         //OBSERVE LOCATION
-        mViewModel.observeLocation().observe(SearchFragment.this , new Observer<Resource<Address>>() {
+        mViewModel.observeLocation().observe(SearchFragment.this, new Observer<Resource<Address>>() {
             @Override
             public void onChanged(Resource<Address> address) {
                 switch (address.status) {
                     case SUCCESS: {
                         Log.d(TAG, "onChanged: LOCATION");
 
-                            mDistanceBusStop = mViewModel.calculateDistanceAndSort(address, mDistanceBusStop);
-                            mAdapter.setBusStops(mDistanceBusStop);
+                        mDistanceBusStop = mViewModel.calculateDistanceAndSort(address, mDistanceBusStop);
+                        mAdapter.setBusStops(mDistanceBusStop);
 
                         break;
                     }
@@ -151,7 +155,8 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             }
         });
     }
-    private void subscribeBusStop(){
+
+    private void subscribeBusStop() {
         //OBSERVE BUS STOP FROM API
         mViewModel.observeBusStops().observe(this, new Observer<Resource<BusStopsResponse>>() {
             @Override
@@ -174,15 +179,17 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                         break;
                     }
                     case ERROR: {
+                        mAdapter.setError();
                         //todo: poinformowac uzytkownika o błędzie
-                        Log.d(TAG, "onChanged: error");
+                        Toast.makeText(getContext(), "TIMEOUT" + busStopsResponseResource.message, Toast.LENGTH_LONG).show();
                         break;
                     }
                 }
             }
         });
     }
-    private void subscribeEstimatedDelays(){
+
+    private void subscribeEstimatedDelays() {
         //OBSERVE DELAYS
         mViewModel.observeEstimatedDelay().observe(this, new Observer<Resource<EstimatedDelayResponse>>() {
             @Override
@@ -213,6 +220,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             }
         });
     }
+
     private void subscribeFragmentState() {
         //OBSERVE FRAGMENT STATE
         mViewModel.observeFragmentState().observe(this, new Observer<IUiAppState>() {
@@ -220,7 +228,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             public void onChanged(IUiAppState uiAppState) {
                 mICommunicationInterface.sendState(uiAppState);
                 switch (uiAppState) {
-                    case BUSSTOP:{
+                    case BUSSTOP: {
                         Log.d(TAG, "onChanged: BUS STOP");
 
                         subscribeBusStop();
@@ -229,7 +237,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                         break;
                     }
 
-                    case VEHICLE:{
+                    case VEHICLE: {
                         mViewModel.observeLocation().removeObservers(SearchFragment.this);
                         mViewModel.observeBusStops().removeObservers(SearchFragment.this);
 
@@ -238,7 +246,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                         break;
                     }
 
-                    case SEARCH:{
+                    case SEARCH: {
                         mViewModel.observeLocation().removeObservers(SearchFragment.this);
                         mViewModel.observeBusStops().removeObservers(SearchFragment.this);
                         mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
@@ -253,6 +261,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     }
 
 
+
     private void initRecyclerView() {
 
         mAdapter = new RecyclerViewAdapter(this);
@@ -263,6 +272,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.recyclerView.setAdapter(mAdapter);
 
     }
+
     private void initLocation() {
         if (EasyPermissions.hasPermissions(getContext(), PERMISSION_LOCATION_ARRAY)) {
             mViewModel.getLocation();
@@ -270,6 +280,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             PermissionManager.requestPermissions(this);
         }
     }
+
     private void initSearchView() {
 
         mBinding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -295,6 +306,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     }
 
 
+
     @Override
     public void onStopClick(String stopId) {
         Optional<Distance<BusStop>> first = mDistanceBusStop.stream().filter(busStop -> {
@@ -311,12 +323,13 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mViewModel.getEstimatedDelaysBy(Integer.valueOf(stopId));
 
 
-
     }
+
     @Override
     public void onVehicleClick(String vehicleId) {
         mICommunicationInterface.sendVehicleID(vehicleId);
     }
+
 
 
     private void showBusStopDetails(Distance<BusStop> busStop) {
@@ -338,6 +351,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
         }
     }
+
     private void hideBusStopDetails() {
         mBinding.toolBar.setVisibility(View.VISIBLE);
 
@@ -354,20 +368,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -378,7 +378,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                     + " must implement TextClicked");
         }
     }
-
 
     @Override
     public void onDetach() {

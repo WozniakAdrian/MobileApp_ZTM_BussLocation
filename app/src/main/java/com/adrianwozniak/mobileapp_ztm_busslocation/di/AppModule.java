@@ -8,6 +8,8 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.google.android.gms.location.LocationRequest;
 import com.patloew.rxlocation.RxLocation;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -21,6 +23,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.CONNECTION_TIMEOUT;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.LOCATION_INTERVAL;
 
 
@@ -37,7 +40,12 @@ public abstract class AppModule {
     static OkHttpClient provideOkHttpClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
-        return new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        return new OkHttpClient.Builder()
+                .callTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .addInterceptor(interceptor)
+                .build();
     }
 
 
