@@ -60,7 +60,7 @@ public class VehicleRepository {
                             @Override
                             public Resource<VehicleResponse> apply(VehicleResponse vehicleResponse) throws Exception {
                                 if (vehicleResponse.getLastUpdate().equals(ERROR_MARK)) {
-                                    return Resource.error(Constants.ERROR_MESSAGE, null);
+                                    return Resource.error(Constants.ERROR_CONNECTION_MESSAGE, null);
                                 } else {
                                     return Resource.success(vehicleResponse);
                                 }

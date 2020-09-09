@@ -3,12 +3,15 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.BaseActivity;
@@ -18,8 +21,11 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.BusStopApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.map.MapFragment;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.viewpager.NavigationAdapter;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.viewpager.ViewPagerAdapter;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 import java.util.Arrays;
@@ -27,6 +33,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -67,10 +75,12 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
 
 
-        NavigationAdapter.getInstance(mBinding);
+//        NavigationAdapter.getInstance(mBinding);
+
+        initBottomNavigation();
+        initViewPager();
 
         mPermissionManager.requestPermissions(this);
-
 
     }
 
@@ -102,6 +112,7 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
             new AppSettingsDialog.Builder(this).build().show();
         }
     }
+
 
 
     @Override
@@ -140,4 +151,90 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
         f.setCurrentVehicle(id);
     }
+
+
+    public void sendCurrentPosition(int position){
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+
+        MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        f.setCurrentViewPagerPage(position);
+
+
+
+    }
+
+
+    public void initBottomNavigation(){
+        mBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.bottom_nav_page_1: {
+                        mBinding.viewPager.setCurrentItem(0);
+                        menuItem.setChecked(true);
+                        sendCurrentPosition(0);
+                        return true;
+                    }
+                    case R.id.bottom_nav_page_2: {
+                        mBinding.viewPager.setCurrentItem(1);
+                        menuItem.setChecked(true);
+                        sendCurrentPosition(1);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        });
+    }
+
+
+    public void initViewPager(){
+        mBinding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mBinding.bottomNavigation.getMenu()
+                        .getItem(position)
+                        .setChecked(true);
+                sendCurrentPosition(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

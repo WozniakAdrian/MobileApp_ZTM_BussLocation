@@ -19,6 +19,8 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.ERROR_LOCATION_MESSAGE;
+
 public class LocationRepository {
 
     private final Observable mLocation;
@@ -53,7 +55,7 @@ public class LocationRepository {
                             @Override
                             public Resource<Address> apply(Address address) throws Exception {
                                 if(address.getAdminArea().equals("ERROR")){
-                                    return Resource.error("We cant get yours location", null);
+                                    return Resource.error(ERROR_LOCATION_MESSAGE, null);
                                 }
                                 return Resource.success(address);
                             }

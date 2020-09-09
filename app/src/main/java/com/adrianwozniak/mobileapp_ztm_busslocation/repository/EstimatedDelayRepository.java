@@ -9,11 +9,15 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.network.EstimatedDelayApi;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
-import io.reactivex.Scheduler;
+import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.VEHICLE_UPDATE_DELAY;
 
 public class EstimatedDelayRepository {
     private static final String TAG = "EstimatedDelayRepositor";
@@ -40,6 +44,8 @@ public class EstimatedDelayRepository {
 
         final LiveData<Resource<EstimatedDelayResponse>> source = LiveDataReactiveStreams.fromPublisher(
                 mEstimatedDelayApi.getBusStopDelaysBy(stopId)
+//                        .repeatWhen(o -> Flowable.timer(VEHICLE_UPDATE_DELAY, TimeUnit.SECONDS).repeat())
+                        //todo mozna to przerobic zeby ladnie sie zmienialo :))
                         .subscribeOn(Schedulers.io())
                         .onErrorReturn(new Function<Throwable, EstimatedDelayResponse>() {
                             @Override
@@ -53,7 +59,7 @@ public class EstimatedDelayRepository {
                             @Override
                             public Resource<EstimatedDelayResponse> apply(EstimatedDelayResponse estimatedDelayResponse) throws Exception {
                                 if(estimatedDelayResponse.getLastUpdate().equals(ERROR_MARK)){
-                                    return Resource.error(Constants.ERROR_MESSAGE, null);
+                                    return Resource.error(Constants.ERROR_CONNECTION_MESSAGE, null);
                                 }else{
                                     return Resource.success(estimatedDelayResponse);
                                 }

@@ -53,7 +53,7 @@ public class BusStopRepository {
                             public Resource<BusStopsResponse> apply(BusStopsResponse busStopsResponse) throws Exception {
 
                                 if(busStopsResponse.getLastUpdate().equals(ERROR_MARK)){
-                                    return Resource.error(Constants.ERROR_MESSAGE, null);
+                                    return Resource.error(Constants.ERROR_CONNECTION_MESSAGE, null);
                                 }else{
                                     return Resource.success(busStopsResponse);
                                 }

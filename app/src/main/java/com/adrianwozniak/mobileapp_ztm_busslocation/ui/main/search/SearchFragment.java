@@ -15,10 +15,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.FragmentSearchBinding;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
@@ -26,12 +28,15 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsRe
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.EstimatedDelayResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivity;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.IOnRecycleViewClickListener;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter.RecyclerViewAdapter;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.SnackbarService;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.StringServices;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.VerticalSpacingItemDecorator;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
+import com.google.android.material.snackbar.Snackbar;
 
 
 import java.util.ArrayList;
@@ -145,8 +150,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                         break;
                     }
                     case ERROR: {
-                        //todo: poinformowac uzytkownika o błędzie
-                        Log.d(TAG, "onChanged: error");
+                        SnackbarService.make(getActivity(), getView(), address.message);
                         break;
                     }
 
@@ -180,8 +184,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                     }
                     case ERROR: {
                         mAdapter.setError();
-                        //todo: poinformowac uzytkownika o błędzie
-                        Toast.makeText(getContext(), "TIMEOUT" + busStopsResponseResource.message, Toast.LENGTH_LONG).show();
+                        SnackbarService.make(getActivity(), getView(), busStopsResponseResource.message).show();
                         break;
                     }
                 }
@@ -213,7 +216,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                     }
                     case ERROR: {
                         //todo: poinformowac uzytkownika o błędzie
-                        Log.d(TAG, "onChanged: error");
+                        SnackbarService.make(getActivity(), getView(), estimatedDelays.message);
                         break;
                     }
                 }
@@ -366,6 +369,9 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.displayDistanceDetailsItem.setVisibility(View.GONE);
     }
 
+    public void setCurrentViewPagerPage(int position){
+        Log.d(TAG, "setCurrentViewPagerPage: SZERCZ KURWA " + position);
+    }
 
 
     @Override

@@ -25,6 +25,8 @@ public class MainActivityViewModel extends ViewModel {
 
     private Application mApplication;
 
+
+
     @Inject
     public MainActivityViewModel() {
         Log.d(TAG, "MainActivityViewModel: working");

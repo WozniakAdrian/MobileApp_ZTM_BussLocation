@@ -1,30 +1,19 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.map;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.location.Address;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.FragmentMapBinding;
@@ -33,15 +22,14 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.models.Vehicle;
 import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.VehicleResponse;
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState;
-import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.BitMapConventer;
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.PermissionManager;
+import com.adrianwozniak.mobileapp_ztm_busslocation.util.SnackbarService;
 import com.adrianwozniak.mobileapp_ztm_busslocation.vm.ViewModelProviderFactory;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,18 +37,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
-
-import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.BUSSTOP;
 
 public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
     private static final String TAG = "MapFragment";
@@ -79,6 +59,7 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
 
     private final static int VEHICLES_UPDATE_INTERVAL = 20;
 
+    private boolean mIsMapCurrentView = false;
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
@@ -237,7 +218,9 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
                         break;
                     }
                     case ERROR: {
-                        Log.d(TAG, "onChanged: error " + vehicleResponseResource.message);
+                        if (mIsMapCurrentView) {
+                            SnackbarService.make(getActivity(), getView(), vehicleResponseResource.message);
+                        }
                         break;
                     }
                 }
@@ -271,7 +254,7 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
     public void setCurrentBussStation(BusStop stop) {
         mMap.clear();
         mCurrentBusStop = stop;
-        mCurrentVehicleID=0;
+        mCurrentVehicleID = 0;
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(
                         mCurrentBusStop.getStopLat(),
@@ -287,5 +270,14 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
         Log.d(TAG, "setCurrentVehicle: ID " + id);
     }
 
+    public void setCurrentViewPagerPage(int position){
+        if(position == 1){
+            mViewModel.getVehicles();
+            mIsMapCurrentView = true;
+        }else {
+            mIsMapCurrentView = false;
+        }
+
+    }
 
 }

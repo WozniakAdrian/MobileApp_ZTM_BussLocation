@@ -1,6 +1,5 @@
-package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main;
+package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.viewpager;
 
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -8,6 +7,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.R;
 import com.adrianwozniak.mobileapp_ztm_busslocation.databinding.ActivityMainBinding;
+import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -20,6 +20,7 @@ public class NavigationAdapter {
     private static final String TAG = "NavigationAdapter";
 
     private static NavigationAdapter instance;
+
 
     public NavigationAdapter(ActivityMainBinding binding) {
         initializeOnNavigationItemSelectedListener(binding);
@@ -56,6 +57,7 @@ public class NavigationAdapter {
             }
         });
     }
+
 
 
     private void initializeViewPagerOnClickListener(ActivityMainBinding binding) {
