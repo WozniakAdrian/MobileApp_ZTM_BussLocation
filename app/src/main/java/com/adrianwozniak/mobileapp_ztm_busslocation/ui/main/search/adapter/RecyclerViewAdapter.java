@@ -1,5 +1,6 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ERROR_TYPE = 4;
 
     private List<Distance<BusStop>> mBusStops = new ArrayList<>();
+    private List<Distance<BusStop>> mBusStopsFull;
+
     private List<VehicleDelay> mVehicleDelays = new ArrayList<>();
     private boolean mIsLoading = false;
     private boolean mIsError = false;
@@ -35,6 +38,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public RecyclerViewAdapter(IOnRecycleViewClickListener clickListener) {
         this.mClickListener = clickListener;
+
     }
 
     @NonNull
@@ -99,6 +103,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mVehicleDelays.clear();
 
         mBusStops = list;
+        mBusStopsFull = new ArrayList<>(mBusStops);
 
         mIsError = false;
         mIsLoading = false;
@@ -164,20 +169,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 List<Distance<BusStop>> filtered = new ArrayList<>();
 
                 if (constraint == null || constraint.length() == 0) {
-                    filtered.addAll(mBusStops);
+                    filtered.addAll(mBusStopsFull);
                 } else {
                     String pattern = constraint.toString().toLowerCase().trim();
 
-                    mBusStops.stream().forEach(item -> {
+
+                    for (Distance<BusStop> item : mBusStopsFull) {
                         if (item.data.getStopDesc().toLowerCase().contains(pattern)) {
                             filtered.add(item);
                         }
-                    });
+                    }
 
                 }
 
                 android.widget.Filter.FilterResults results = new Filter.FilterResults();
                 results.values = filtered;
+
+                Log.d(TAG, "performFiltering: BusStopSize " + mBusStopsFull.size());
+                Log.d(TAG, "performFiltering: Filtered " + filtered.size());
                 return results;
             }
 

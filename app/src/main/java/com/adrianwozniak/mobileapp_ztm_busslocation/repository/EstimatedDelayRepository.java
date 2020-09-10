@@ -44,8 +44,6 @@ public class EstimatedDelayRepository {
 
         final LiveData<Resource<EstimatedDelayResponse>> source = LiveDataReactiveStreams.fromPublisher(
                 mEstimatedDelayApi.getBusStopDelaysBy(stopId)
-//                        .repeatWhen(o -> Flowable.timer(VEHICLE_UPDATE_DELAY, TimeUnit.SECONDS).repeat())
-                        //todo mozna to przerobic zeby ladnie sie zmienialo :))
                         .subscribeOn(Schedulers.io())
                         .onErrorReturn(new Function<Throwable, EstimatedDelayResponse>() {
                             @Override

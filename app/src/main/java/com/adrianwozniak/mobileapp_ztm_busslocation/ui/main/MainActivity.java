@@ -117,17 +117,22 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle("Really Exit?")
-                .setMessage("Are you sure you want to exit?")
-                .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .create().show();
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 0;
+        SearchFragment f = (SearchFragment) getSupportFragmentManager().findFragmentByTag(tag);
+
+        if(!f.onBackPressed()){
+            new AlertDialog.Builder(this)
+                    .setTitle("Wyjście")
+                    .setMessage("Jesteś pewien czy chcesz zakończyć działanie aplikacji?")
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .create().show();
+        }
     }
 
 
@@ -149,6 +154,7 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     public void sendVehicleID(String id) {
         String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
         MapFragment f = (MapFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        changePageToMap();
         f.setCurrentVehicle(id);
     }
 
@@ -215,7 +221,9 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
 
 
-
+    public void changePageToMap(){
+        mBinding.viewPager.setCurrentItem(2);
+    }
 
 
 

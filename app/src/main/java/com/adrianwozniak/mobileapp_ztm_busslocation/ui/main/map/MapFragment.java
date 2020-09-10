@@ -47,6 +47,8 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
+    private static final float MAP_ZOOM = 15;
+
     private FragmentMapBinding mBinding;
 
     private MapFragmentViewModel mViewModel;
@@ -55,6 +57,7 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
 
     private List<Vehicle> mVehicles;
     private int mCurrentVehicleID = 0;
+    private int mCurrentVehicleCounter = -1;
     private BusStop mCurrentBusStop;
 
     private final static int VEHICLES_UPDATE_INTERVAL = 20;
@@ -190,23 +193,11 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
                                     .ifPresent(vehicle -> {
                                         mMap.clear();
 
-                                        mMap.addMarker(new MarkerOptions()
-                                                .position(new LatLng(
-                                                        vehicle.getLat(),
-                                                        vehicle.getLon()
-                                                ))
-                                                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_bus)))
-                                                .title(vehicle.getLine()));
+                                        addBusMarker(vehicle);
 
-                                        mMap.addMarker(new MarkerOptions()
-                                                .position(new LatLng(
-                                                        mCurrentBusStop.getStopLat(),
-                                                        mCurrentBusStop.getStopLon()
-                                                ))
-                                                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_arrow)))
-                                                .title(mCurrentBusStop.getStopDesc()));
+                                        moveCameraOnce(new LatLng(vehicle.getLat(), vehicle.getLon()));
 
-
+                                        addBusStopMarker();
                                     });
                         }
 
@@ -266,18 +257,47 @@ public class MapFragment extends DaggerFragment implements OnMapReadyCallback {
 
     public void setCurrentVehicle(String id) {
         mCurrentVehicleID = Integer.parseInt(id);
+        mCurrentVehicleCounter = 0;
 
         Log.d(TAG, "setCurrentVehicle: ID " + id);
     }
 
-    public void setCurrentViewPagerPage(int position){
-        if(position == 1){
+    public void setCurrentViewPagerPage(int position) {
+        if (position == 1) {
             mViewModel.getVehicles();
             mIsMapCurrentView = true;
-        }else {
+        } else {
             mIsMapCurrentView = false;
         }
 
     }
 
+    public void moveCameraOnce(LatLng cameraDestination) {
+        if (mCurrentVehicleCounter == 0) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraDestination, MAP_ZOOM));
+        }
+        mCurrentVehicleCounter++;
+    }
+
+    public void addBusMarker(Vehicle vehicle) {
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(
+                        vehicle.getLat(),
+                        vehicle.getLon()
+                ))
+                .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_bus)))
+                .title(vehicle.getLine()));
+    }
+
+    public void addBusStopMarker() {
+        if (mCurrentBusStop != null) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(
+                            mCurrentBusStop.getStopLat(),
+                            mCurrentBusStop.getStopLon()
+                    ))
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitMapConventer.getBitmap(getContext(), R.drawable.ic_arrow)))
+                    .title(mCurrentBusStop.getStopDesc()));
+        }
+    }
 }

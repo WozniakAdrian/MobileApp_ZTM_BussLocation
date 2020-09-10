@@ -49,6 +49,7 @@ import dagger.android.support.DaggerFragment;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.BUSSTOP;
+import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.SEARCH;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.IUiAppState.VEHICLE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.GONE;
 import static com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.search.SearchFragmentViewModel.DetailsState.VISIBLE;
@@ -79,6 +80,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
 
     private List<Distance<BusStop>> mDistanceBusStop = new ArrayList<>();
 
+    private IUiAppState mState;
 
     @Inject
     ViewModelProviderFactory mProviderFactory;
@@ -99,17 +101,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         view.setFocusableInTouchMode(true);
         view.requestFocus();
 
-        //ON BACK PRESS LOGIC
-        view.setOnKeyListener((v, keyCode, event) -> {
-            Log.i(TAG, "keyCode: " + keyCode);
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                if (mBinding.details.getVisibility() == View.VISIBLE) {
-                    hideBusStopDetails();
-                    return true;
-                }
-            }
-            return false;
-        });
 
         mViewModel = new ViewModelProvider(this, mProviderFactory)
                 .get(SearchFragmentViewModel.class);
@@ -124,6 +115,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         initRecyclerView();
         initSearchView();
         initLocation();
+
 
 
     }
@@ -232,24 +224,25 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                 mICommunicationInterface.sendState(uiAppState);
                 switch (uiAppState) {
                     case BUSSTOP: {
-                        Log.d(TAG, "onChanged: BUS STOP");
-
-                        subscribeBusStop();
+                        Log.d(TAG, "onChanged: BUS");
+                        mState = BUSSTOP;
                         mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
-
+                        subscribeBusStop();
                         break;
                     }
 
                     case VEHICLE: {
+                        Log.d(TAG, "onChanged: VEH");
+                        mState = VEHICLE;
                         mViewModel.observeLocation().removeObservers(SearchFragment.this);
                         mViewModel.observeBusStops().removeObservers(SearchFragment.this);
-
                         subscribeEstimatedDelays();
-
                         break;
                     }
 
                     case SEARCH: {
+                        Log.d(TAG, "onChanged: SER");
+                        mState = SEARCH;
                         mViewModel.observeLocation().removeObservers(SearchFragment.this);
                         mViewModel.observeBusStops().removeObservers(SearchFragment.this);
                         mViewModel.observeEstimatedDelay().removeObservers(SearchFragment.this);
@@ -301,8 +294,16 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
             }
         });
 
-        mBinding.searchView.setOnCloseListener(() -> {
+        mBinding.searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    mViewModel.getBusStops();
+                }
+            }
+        });
 
+        mBinding.searchView.setOnCloseListener(() -> {
             mViewModel.getBusStops();
             return true;
         });
@@ -369,10 +370,6 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.displayDistanceDetailsItem.setVisibility(View.GONE);
     }
 
-    public void setCurrentViewPagerPage(int position){
-        Log.d(TAG, "setCurrentViewPagerPage: SZERCZ KURWA " + position);
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -389,6 +386,23 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
     public void onDetach() {
         mICommunicationInterface = null; // => avoid leaking, thanks @Deepscorn
         super.onDetach();
+    }
+
+    public boolean onBackPressed(){
+
+        Log.d(TAG, "onBackPressed: w serczu");
+
+                if (mBinding.details.getVisibility() == View.VISIBLE) {
+                    hideBusStopDetails();
+                    return true;
+                }
+                if(mState == VEHICLE){
+                    hideBusStopDetails();
+                    return true;
+                }
+
+            return false;
+
     }
 }
 
