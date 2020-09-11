@@ -192,11 +192,7 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
                 switch (estimatedDelays.status) {
                     case SUCCESS: {
 
-                        Log.d(TAG, "onChanged: success edt");
-                        estimatedDelays.data.getVehicleDelays().stream().forEach(
-                                item -> Log.d(TAG, "onChanged: " + item.toString())
-                        );
-
+                        mBinding.displayLastupdateDetailsItem.setText("Ostatni update: " + estimatedDelays.data.getLastUpdate());
                         mAdapter.setVehicles(estimatedDelays.data.getVehicleDelays());
 
                         break;
@@ -306,6 +302,16 @@ public class SearchFragment extends DaggerFragment implements IOnRecycleViewClic
         mBinding.searchView.setOnCloseListener(() -> {
             mViewModel.getBusStops();
             return true;
+        });
+
+        //on clear click
+        mBinding.searchView.setOnClickListener(v -> {
+            if(v.getId() == mBinding.searchView
+                    .getContext()
+                    .getResources()
+                    .getIdentifier("android:id/search_close_btn", null, null)){
+                mViewModel.getBusStops();
+            }
         });
     }
 
