@@ -24,9 +24,15 @@ public class StringServices {
      * @return string
      */
     public static String getDisplayName(BusStop value) {
+
         if (value == null) {
             throw new NullPointerException();
         }
+
+        if(value.getStopDesc().isEmpty() || value.getStopDesc().length() < 2){
+            return "";
+        }
+
         String displayName = "";
 
         if (value.getStopDesc().startsWith("Gdynia ")) {
@@ -62,7 +68,7 @@ public class StringServices {
     }
 
 
-    /***
+    /**
      * This method cut given string from auto complete drop down and return list of three items
      * zoneName, stopDesc, subName
      * @param s String
@@ -99,19 +105,15 @@ public class StringServices {
     }
 
 
-
+    /**
+     *  this method returns String, as value we pass vehicle where vehicle delay is prepared to display into ui
+     * @param vehicle
+     * @return
+     */
     public static String getDelayString(VehicleDelay vehicle){
 
         int delay = vehicle.getDelayInSeconds();
         String outputString = "";
-
-//        if(delay > 0 ){
-//            outputString = " Opóźniony ";
-//        }else{
-//            outputString = " Przyśpieszony ";
-//
-//
-//        }
 
         int minutes = 0;
         int seconds = 0;
@@ -138,6 +140,12 @@ public class StringServices {
         return outputString;
     }
 
+    /**
+     * this method return status of buss depends on how many second the vehicle is delayed
+     * it is prepared to be display on UI
+     * @param vehicle
+     * @return
+     */
     public static String getDelayWarningString(VehicleDelay vehicle) {
 
         if (vehicle.getDelayInSeconds() < 30 && vehicle.getDelayInSeconds() > -30) {
