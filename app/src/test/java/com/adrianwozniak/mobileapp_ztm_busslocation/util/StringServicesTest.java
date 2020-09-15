@@ -1,12 +1,14 @@
 package com.adrianwozniak.mobileapp_ztm_busslocation.util;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.Null;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,5 +85,39 @@ public class StringServicesTest {
     }
 
 
-    
+    //GET DISTANCE
+    //give good data return correct string
+    @Test
+    void getDistance() throws Exception {
+        //Arrange
+        Distance<BusStop> distance = Distance.setDistance(busStop, 1200);
+
+        //Assert
+        assertEquals("1,2km", StringServices.getDistance(distance));
+    }
+
+    //give bad data return exception
+    @Test
+    void getDistance_badData() throws Exception {
+        //Arrange
+        Distance<BusStop> distance = Distance.setDistance(busStop, -1200);
+
+        //Assert
+        assertEquals("", StringServices.getDistance(distance));
+
+    }
+
+    //give null return exception
+    @Test
+    void getDistance_null() throws Exception {
+
+        //Arrange
+        Distance<BusStop> distanceDataNull = Distance.setDistance(busStopNull, -1200);
+
+        //Assert
+        assertThrows(NullPointerException.class, ()-> StringServices.getDistance(distanceDataNull));
+    }
+
+
+
 }

@@ -56,53 +56,19 @@ public class StringServices {
      */
     public static String getDistance(Distance<BusStop> value){
 
-        if(value == null){
+        if(value.data == null)
             throw new NullPointerException();
-        }else{
-            String s = value.distance > 999 ? df.format(value.distance / 1000d ) + "km":
-                    (int) value.distance + "m";
+        if(value.distance < 0)
+            return "";
 
-            return s;
-        }
+        String s = value.distance > 999 ? df.format(value.distance / 1000d ) + "km":
+                (int) value.distance + "m";
+
+        return s;
+
 
     }
 
-
-    /**
-     * This method cut given string from auto complete drop down and return list of three items
-     * zoneName, stopDesc, subName
-     * @param s String
-     * @return String[]
-     */
-    public static String[] getSeparatedStrings(String s) {
-        String[] list = {"", "", ""};
-        if (s.isEmpty()) {
-            return list;
-        }
-        if (s != null) {
-
-            int spaceIndex = -1;
-
-            for (int i = 0; i < s.length(); i++) {
-                if (Character.isWhitespace(s.charAt(i))) {
-                    spaceIndex = i;
-                    break;
-                }
-            }
-
-            list[0] = s.substring(0, spaceIndex);
-
-            if (list[0].equals("Gdańsk")) {
-                list[1] = s.substring(0, s.length() - 2);
-            } else {
-                list[1] = s.substring(spaceIndex, s.length() - 2);
-            }
-
-            list[2] = s.substring(s.length() - 2, s.length());
-        }
-
-        return list;
-    }
 
 
     /**
@@ -134,8 +100,7 @@ public class StringServices {
         }else{
             outputString += delay + "s";
         }
-
-
+        
 
         return outputString;
     }
