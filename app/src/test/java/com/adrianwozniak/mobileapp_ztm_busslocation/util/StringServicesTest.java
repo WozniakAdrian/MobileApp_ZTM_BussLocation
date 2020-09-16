@@ -2,6 +2,7 @@ package com.adrianwozniak.mobileapp_ztm_busslocation.util;
 
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.BusStop;
 import com.adrianwozniak.mobileapp_ztm_busslocation.models.Distance;
+import com.adrianwozniak.mobileapp_ztm_busslocation.models.VehicleDelay;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,8 +19,12 @@ public class StringServicesTest {
     public static BusStop busStopNull;
     public static BusStop busStopBadData;
 
+    public static VehicleDelay vehicleDelay;
+    public static VehicleDelay vehicleDelayNull;
+
+
     @BeforeAll
-    static void init(){
+    static void init() {
         busStop = new BusStop(
                 8227,
                 "04",
@@ -33,13 +38,13 @@ public class StringServicesTest {
                 0,
                 0,
                 0,
-                0 ,
-                0 ,
+                0,
+                0,
                 "2020-09-12",
                 54.47317,
                 18.46509);
         busStopNull = null;
-        busStopBadData= new BusStop(
+        busStopBadData = new BusStop(
                 8227,
                 "04",
                 "", //Changed
@@ -52,12 +57,27 @@ public class StringServicesTest {
                 0,
                 0,
                 0,
-                0 ,
-                0 ,
+                0,
+                0,
                 "2020-09-12",
                 54.47317,
                 18.46509);
 
+
+        vehicleDelay = new VehicleDelay(
+                "T21R154",
+                160,
+                "10:01",
+                "Orunia Górna",
+                154,
+                21,
+                "REALTIME",
+                "09:59",
+                "10:00:01",
+                849417,
+                2646,
+                470);
+        vehicleDelayNull = null;
     }
 
     // GET DISPLAY NAME
