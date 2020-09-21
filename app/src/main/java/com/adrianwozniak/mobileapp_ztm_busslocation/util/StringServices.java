@@ -78,6 +78,10 @@ public class StringServices {
      */
     public static String getDelayString(VehicleDelay vehicle){
 
+        if (vehicle == null) {
+            throw new NullPointerException();
+        }
+
         int delay = vehicle.getDelayInSeconds();
         String outputString = "";
 
@@ -112,6 +116,9 @@ public class StringServices {
      * @return
      */
     public static String getDelayWarningString(VehicleDelay vehicle) {
+        if (vehicle == null) {
+            throw new NullPointerException();
+        }
 
         if (vehicle.getDelayInSeconds() < 30 && vehicle.getDelayInSeconds() > -30) {
             return "ROZKŁADOWO";
@@ -120,7 +127,7 @@ public class StringServices {
         if(vehicle.getDelayInSeconds() < 0 ){
             return "PRZYŚPIESZONY o: " + StringServices.getDelayString(vehicle);
         }else {
-            return "OPÓŹNIONY o: " +StringServices.getDelayString(vehicle);
+            return "OPÓŹNIONY o: " + StringServices.getDelayString(vehicle);
         }
 
     }

@@ -116,7 +116,7 @@ public class StringServicesTest {
         assertEquals("1,2km", StringServices.getDistance(distance));
     }
 
-    //give bad data return exception
+    //give bad data return empty string
     @Test
     void getDistance_badData() throws Exception {
         //Arrange
@@ -139,5 +139,64 @@ public class StringServicesTest {
     }
 
 
+    //GET DELAY
+    //give good data return correct string
+    @Test
+    void getDelay() throws Exception {
+        // 0
+        vehicleDelay.setDelayInSeconds(0);
+        System.out.println(StringServices.getDelayString(vehicleDelay));
+        assertEquals("0s", StringServices.getDelayString(vehicleDelay));
 
+
+        // -10
+        vehicleDelay.setDelayInSeconds(-10);
+        System.out.println(StringServices.getDelayString(vehicleDelay));
+        assertEquals("10s", StringServices.getDelayString(vehicleDelay));
+
+        //-10
+        vehicleDelay.setDelayInSeconds(10);
+        System.out.println(StringServices.getDelayString(vehicleDelay));
+        assertEquals("10s", StringServices.getDelayString(vehicleDelay));
+
+        // -110
+        vehicleDelay.setDelayInSeconds(110);
+        System.out.println(StringServices.getDelayString(vehicleDelay));
+        assertEquals("1:50min", StringServices.getDelayString(vehicleDelay));
+    }
+
+
+    //give null return exception
+    @Test
+    void getDelay_null() throws Exception {
+        //Assert
+        assertThrows(NullPointerException.class, ()-> StringServices.getDelayString(vehicleDelayNull));
+    }
+
+
+    //give good data
+    @Test
+    void getDelayDisplayString() throws Exception {
+
+        //10
+        vehicleDelay.setDelayInSeconds(10);
+        assertEquals("ROZKŁADOWO", StringServices.getDelayWarningString(vehicleDelay));
+
+
+        // -110
+        vehicleDelay.setDelayInSeconds(-110);
+        assertEquals("PRZYŚPIESZONY o: " + StringServices.getDelayString(vehicleDelay), StringServices.getDelayWarningString(vehicleDelay));
+
+        //+110
+        vehicleDelay.setDelayInSeconds(110);
+        assertEquals("OPÓŹNIONY o: " + StringServices.getDelayString(vehicleDelay), StringServices.getDelayWarningString(vehicleDelay));
+
+    }
+
+    //give null
+    @Test
+    void getDelayDisplayString_null() throws Exception {
+        //Assert
+        assertThrows(NullPointerException.class, ()-> StringServices.getDelayWarningString(vehicleDelayNull));
+    }
 }
