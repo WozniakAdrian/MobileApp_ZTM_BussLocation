@@ -9,6 +9,8 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.di.main.MainActivityViewModelsModule;
 import com.adrianwozniak.mobileapp_ztm_busslocation.ui.main.MainActivity;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 

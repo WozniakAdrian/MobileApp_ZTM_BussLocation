@@ -9,6 +9,7 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.repository.VehicleRepository
 import com.adrianwozniak.mobileapp_ztm_busslocation.repository.LocationRepository;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;

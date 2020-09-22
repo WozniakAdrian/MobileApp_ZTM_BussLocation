@@ -10,10 +10,12 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.network.responses.BusStopsRe
 import com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+@Singleton
 public class BusStopRepository {
     private static final String TAG = "BusStopRepository";
 

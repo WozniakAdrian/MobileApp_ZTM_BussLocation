@@ -14,6 +14,7 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
@@ -21,7 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.VEHICLE_UPDATE_DELAY;
 
-
+@Singleton
 public class VehicleRepository {
     private static final String TAG = "VehicleRepository";
 

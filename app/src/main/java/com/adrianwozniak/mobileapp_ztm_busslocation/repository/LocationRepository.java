@@ -13,6 +13,7 @@ import com.adrianwozniak.mobileapp_ztm_busslocation.repository.Resource;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
@@ -21,6 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.adrianwozniak.mobileapp_ztm_busslocation.util.Constants.ERROR_LOCATION_MESSAGE;
 
+@Singleton
 public class LocationRepository {
 
     private final Observable mLocation;
