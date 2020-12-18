@@ -18,8 +18,7 @@
 
 ## Screenshots
 <p align="center">
- <img src="./01.gif" data-canonical-src="./video.gif" width="180" height="400" />
- <img src="./02.gif" data-canonical-src="./ui.jpg" width="180" height="400" />
+ <img src="./video.gif" data-canonical-src="./video.gif" width="180" height="400" />
 </p>
 
 
