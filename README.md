@@ -1,12 +1,11 @@
 # ZTM Gdańsk - Buss location
->Jest to aplikacja stworzona na system android. Za pomocą aplikacji można wyszukać dowolny przystanek autobusowy i tramwajowy w gdańsku, bądź sprawdzić najbliższy naszemu położeniu. W czasie rzeczywistym są zaprezentowane dane na temat najbliższych autobusów, ich szacowany czas przyjazdu oraz czy są opoźnione. Można też śledzić położenie autobusu za pomocą map google. 
+>It is an application designed for the android system. Using the application, you can search for any bus and tram stop in Gdańsk, or check the nearest one to our location. Data on the nearest buses, their estimated arrival time and whether they are delayed are presented in real time. You can also track the location of the bus using google maps.
 
 
 ## Table of contents
 * [General info](#general-info)
 * [Screenshots](#screenshots)
 * [Technologies](#technologies)
-* [Setup](#setup)
 * [Features](#features)
 * [Status](#status)
 * [Contact](#contact)
@@ -14,7 +13,7 @@
 
 
 ## General info
-> A więc skąd są dane? Dane w czasie rzeczywistym są udostępnione przez ckan.multimediagdansk.pl, w ich skład wchodzi między innymi położenie przystanków, autobusów, tramwajów oraz estymowane czasy przyjazdów na dany przystanek.W momencie pierwszego uruchomienia urzytkownik jest proszony o przydzielenie uprawnień do lokalizacji i internetu. Jeżeli urzytkownik nie wyrazi zgody aplikacja nie pokazuje najbliższych przystanków tylko wyświetla ich listę w nieuporządkowany sposób. Po wybraniu interesującego nas przystanku prezentowana jest lista autobusów które będą się zatrzymywać na tym przystanku, autobusy wyświetlone są wraz z informacjiami o której jest planowany przyjazd, o której realnie można się spodziewać autobusu oraz czy autobus jest opóźniony, jeśli jest to o ile. Po wybraniu interesującego nas środka transporu aplikaja przenośi urzytkownika do map google gdzie zaznaczona jest aktualna lokalizacja urzytkownika, wybranego przystanka oraz środka komunikacji który został wybrany do śledzenia. Mapy odświeżają się automatycznie gdy wykryją ruch autobusu i uaktualniają jego pozycję. Precyzja aplikacji wynosi 20s, jest to spowodowane środkami bezpieczeństwa które narzuciło API.
+> So where is the data from? Real-time data is provided by ckan.multimediagdansk.pl, it includes, among others, the location of stops, buses, trams and estimated arrival times at a given stop. At the time of the first launch, the user is asked to assign location permissions. If the user does not agree, the application does not show the nearest stops but displays their list in an unordered way. After selecting the stop you are interested in, a list of buses that will stop at this stop is presented, the buses are displayed along with information about the planned arrival, when the bus can be realistically expected and whether the bus is delayed. After selecting the desired means of transport, the application takes the user to google maps where the current location of the user, the selected stop and the vehicle that has been selected for tracking is marked. The maps refresh automatically when they detect the bus movement and update its position. The precision of the application is 20s, this is due to the security measures imposed by the API.
 
 ## Screenshots
 1. Overview
@@ -49,14 +48,10 @@
 
 
 
-## Setup
-
-### Create Constans file
-> xxxxxxxxxxxxxxxx
-
 ## Features
-* adasd
-* asdasd
+* List of the nearest stops for the user's device location
+* Check the current delay of buses and trams at the selected stop
+* The current location of the selected ZTM Gdańsk vehicle
 
 
 
